@@ -1,31 +1,26 @@
-package org.dist.mykafka
+package org.dist.learning
 
+import org.I0Itec.zkclient.ZkClient
 import org.I0Itec.zkclient.exception.ZkNoNodeException
-import org.I0Itec.zkclient.{IZkChildListener, ZkClient}
-import org.dist.simplekafka.BrokerChangeListener
-import org.dist.simplekafka.common.JsonSerDes
-import org.dist.simplekafka.util.ZkUtils.Broker
+import org.dist.learning.common.JsonSerDes
+import org.dist.learning.util.ZkUtils.Broker
 
 import scala.jdk.CollectionConverters._
 
 class MyZookeeperClient(zkClient:ZkClient) {
-  val BrokerTopicsPath = "/brokers/topics"
-  val BrokerIdsPath = "/brokers/ids"
-  val ControllerPath = "/controller"
-  val ReplicaLeaderElectionPath = "/topics/replica/leader"
-
-  def subscribeBrokerChangeListener(listener: IZkChildListener): Option[List[String]] = {
+  def subscribeBrokerChangeListener(listener: MyBrokerChangeListener): Option[List[String]] = {
     val result = zkClient.subscribeChildChanges(BrokerIdsPath, listener)
     Option(result).map(_.asScala.toList)
   }
 
+  val BrokerTopicsPath = "/brokers/topics"
+  val BrokerIdsPath = "/brokers/ids"
 
   def registerBroker(broker:Broker) = {
     val brokerData = JsonSerDes.serialize(broker)
     val brokerPath = getBrokerPath(broker.id)
     createEphemeralPath(zkClient, brokerPath, brokerData)
   }
-
 
   def getAllBrokers(): Set[Broker] = {
     zkClient.getChildren(BrokerIdsPath).asScala.map(brokerId => {
@@ -42,7 +37,6 @@ class MyZookeeperClient(zkClient:ZkClient) {
   private def getBrokerPath(id: Int) = {
     BrokerIdsPath + "/" + id
   }
-
 
   def createEphemeralPath(client: ZkClient, path: String, data: String): Unit = {
     try {
