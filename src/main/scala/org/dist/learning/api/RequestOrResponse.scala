@@ -1,6 +1,6 @@
-package org.dist.simplekafka.api
+package org.dist.learning.api
 
-import org.dist.simplekafka.common.JsonSerDes
+import org.dist.learning.common.JsonSerDes
 
 object Request {
   val FollowerReplicaFetcherId: Int = 0

@@ -1,13 +1,15 @@
 package org.dist.learning
 
 import org.I0Itec.zkclient.ZkClient
-import org.I0Itec.zkclient.exception.ZkNoNodeException
+import org.I0Itec.zkclient.exception.{ZkNoNodeException, ZkNodeExistsException}
 import org.dist.learning.common.JsonSerDes
 import org.dist.learning.util.ZkUtils.Broker
 
 import scala.jdk.CollectionConverters._
 
 class MyZookeeperClient(zkClient:ZkClient) {
+  def getAllTopics() = ???
+
   def subscribeBrokerChangeListener(listener: MyBrokerChangeListener): Option[List[String]] = {
     val result = zkClient.subscribeChildChanges(BrokerIdsPath, listener)
     Option(result).map(_.asScala.toList)
@@ -15,6 +17,7 @@ class MyZookeeperClient(zkClient:ZkClient) {
 
   val BrokerTopicsPath = "/brokers/topics"
   val BrokerIdsPath = "/brokers/ids"
+  val ControllerPath = "/controller"
 
   def registerBroker(broker:Broker) = {
     val brokerData = JsonSerDes.serialize(broker)
@@ -36,6 +39,17 @@ class MyZookeeperClient(zkClient:ZkClient) {
 
   private def getBrokerPath(id: Int) = {
     BrokerIdsPath + "/" + id
+  }
+
+  def tryCreatingControllerPath(controllerId: String): Unit = {
+    try {
+      createEphemeralPath(zkClient, ControllerPath, controllerId)
+    } catch {
+      case e: ZkNodeExistsException => {
+        val existingControllerId: String = zkClient.readData(ControllerPath)
+        throw new ControllerExistsException(existingControllerId)
+      }
+    }
   }
 
   def createEphemeralPath(client: ZkClient, path: String, data: String): Unit = {
@@ -65,4 +79,10 @@ class MyZookeeperClient(zkClient:ZkClient) {
       }
     }
   }
+
+  def getAllBrokerIds(): Set[Int] = {
+    zkClient.getChildren(BrokerIdsPath).asScala.map(_.toInt).toSet
+  }
 }
+
+case class ControllerExistsException(controllerId: String) extends RuntimeException

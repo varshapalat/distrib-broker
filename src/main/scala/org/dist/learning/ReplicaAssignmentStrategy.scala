@@ -1,4 +1,4 @@
-package org.dist.simplekafka
+package org.dist.learning
 
 class ReplicaAssignmentStrategy {
   def assignReplica(partitionId: Int, replicationFactor: Int, brokerIds: List[Int]): List[Int] = {

@@ -15,7 +15,7 @@
  * limitations under the License.
 */
 
-package org.dist.simplekafka.server
+package org.dist.learning.server
 
 object CompressionCodec {
   def getCompressionCodec(codec: Int): CompressionCodec = {

@@ -1,7 +1,7 @@
 package org.dist.learning.common
 
 import org.apache.log4j.Logger
-import org.dist.simplekafka.util.Utils
+import org.dist.learning.util.Utils
 
 trait Logging {
   val loggerName = this.getClass.getName

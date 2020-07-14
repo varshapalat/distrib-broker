@@ -1,8 +1,8 @@
-package org.dist.simplekafka.network
+package org.dist.learning.network
 
 import java.net.Socket
 
-import org.dist.simplekafka.api.RequestOrResponse
+import org.dist.learning.api.RequestOrResponse
 import org.dist.util.SocketIO
 
 class SocketSender {

@@ -1,10 +1,10 @@
-package org.dist.simplekafka.network
+package org.dist.learning.network
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import org.dist.simplekafka.api.{RequestKeys, RequestOrResponse, TopicMetadataRequest, TopicMetadataResponse}
-import org.dist.simplekafka.common.JsonSerDes
-import org.dist.simplekafka.server.Config
+import org.dist.learning.api.{RequestKeys, RequestOrResponse, TopicMetadataRequest, TopicMetadataResponse}
+import org.dist.learning.common.JsonSerDes
+import org.dist.learning.server.Config
 
 import scala.collection.Set
 

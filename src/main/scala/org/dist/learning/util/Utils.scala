@@ -6,7 +6,7 @@ import java.nio.channels.{FileChannel, ReadableByteChannel}
 import java.util.concurrent.locks.Lock
 import java.util.zip.CRC32
 
-import org.dist.simplekafka.common.Logging
+import org.dist.learning.common.Logging
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.{Map, Seq, mutable}

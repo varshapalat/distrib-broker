@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.dist.simplekafka.network.InetAddressAndPort
+import org.dist.learning.network.InetAddressAndPort
 
 object JsonSerDes {
 

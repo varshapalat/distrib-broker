@@ -3,7 +3,7 @@ package org.dist.common
 import java.net.InetSocketAddress
 
 import org.apache.zookeeper.server.{NIOServerCnxnFactory, ZooKeeperServer}
-import org.dist.simplekafka.util.Utils
+import org.dist.learning.util.Utils
 
 
 class EmbeddedZookeeper(val connectString: String) {

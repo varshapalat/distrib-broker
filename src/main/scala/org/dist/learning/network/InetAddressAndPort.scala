@@ -1,4 +1,4 @@
-package org.dist.simplekafka.network
+package org.dist.learning.network
 
 import java.net.InetAddress
 

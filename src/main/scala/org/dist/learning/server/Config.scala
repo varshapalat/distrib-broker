@@ -1,4 +1,4 @@
-package org.dist.simplekafka.server
+package org.dist.learning.server
 
 import scala.collection.Map
 

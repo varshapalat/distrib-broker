@@ -2,7 +2,7 @@ package org.dist.common
 
 import akka.actor.ActorSystem
 import org.I0Itec.zkclient.ZkClient
-import org.dist.simplekafka.util.ZKStringSerializer
+import org.dist.learning.util.ZKStringSerializer
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 
 object TestZKUtils {

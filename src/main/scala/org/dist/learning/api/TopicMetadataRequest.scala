@@ -1,4 +1,4 @@
-package org.dist.simplekafka.api
+package org.dist.learning.api
 
 case class TopicMetadataRequest(val versionId: Short,
                                 val correlationId: Int,
