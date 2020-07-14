@@ -1,7 +1,7 @@
 package org.dist.learningkafka
 
-import org.I0Itec.zkclient.exception.ZkNoNodeException
 import org.I0Itec.zkclient.{IZkChildListener, ZkClient}
+import org.I0Itec.zkclient.exception.ZkNoNodeException
 import org.dist.simplekafka.common.JsonSerDes
 import org.dist.simplekafka.util.ZkUtils.Broker
 
@@ -18,13 +18,11 @@ class MyZookeeperClient(zkClient:ZkClient) {
     Option(result).map(_.asScala.toList)
   }
 
-
   def registerBroker(broker:Broker) = {
     val brokerData = JsonSerDes.serialize(broker)
     val brokerPath = getBrokerPath(broker.id)
     createEphemeralPath(zkClient, brokerPath, brokerData)
   }
-
 
   def getAllBrokers(): Set[Broker] = {
     zkClient.getChildren(BrokerIdsPath).asScala.map(brokerId => {
@@ -42,7 +40,6 @@ class MyZookeeperClient(zkClient:ZkClient) {
     BrokerIdsPath + "/" + id
   }
 
-
   def createEphemeralPath(client: ZkClient, path: String, data: String): Unit = {
     try {
       client.createEphemeral(path, data)
@@ -58,16 +55,5 @@ class MyZookeeperClient(zkClient:ZkClient) {
     val parentDir = path.substring(0, path.lastIndexOf('/'))
     if (parentDir.length != 0)
       client.createPersistent(parentDir, true)
-  }
-
-  def createPersistentPath(client: ZkClient, path: String, data: String = ""): Unit = {
-    try {
-      client.createPersistent(path, data)
-    } catch {
-      case e: ZkNoNodeException => {
-        createParentPath(client, path)
-        client.createPersistent(path, data)
-      }
-    }
   }
 }
