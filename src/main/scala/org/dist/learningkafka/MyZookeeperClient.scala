@@ -1,16 +1,19 @@
 package org.dist.learningkafka
 
+import org.I0Itec.zkclient.exception.{ZkNoNodeException, ZkNodeExistsException}
 import org.I0Itec.zkclient.{IZkChildListener, ZkClient}
-import org.I0Itec.zkclient.exception.ZkNoNodeException
+import org.dist.simplekafka.ControllerExistsException
 import org.dist.simplekafka.common.JsonSerDes
 import org.dist.simplekafka.util.ZkUtils.Broker
 
 import scala.jdk.CollectionConverters._
 
-class MyZookeeperClient(zkClient:ZkClient) {
+class MyZookeeperClient(zkClient: ZkClient) {
+
+
   val BrokerTopicsPath = "/brokers/topics"
   val BrokerIdsPath = "/brokers/ids"
-  val ControllerPath = "/controller"
+  val ControllerPath = "/controller_new"
   val ReplicaLeaderElectionPath = "/topics/replica/leader"
 
   def subscribeBrokerChangeListener(listener: IZkChildListener): Option[List[String]] = {
@@ -18,7 +21,11 @@ class MyZookeeperClient(zkClient:ZkClient) {
     Option(result).map(_.asScala.toList)
   }
 
-  def registerBroker(broker:Broker) = {
+  def subscribeControllerChangeListener(myController : MyController): Unit = {
+    zkClient.subscribeDataChanges(ControllerPath, new MyControllerChangeListener(zkClient, myController))
+  }
+
+  def registerBroker(broker: Broker) = {
     val brokerData = JsonSerDes.serialize(broker)
     val brokerPath = getBrokerPath(broker.id)
     createEphemeralPath(zkClient, brokerPath, brokerData)
@@ -47,6 +54,17 @@ class MyZookeeperClient(zkClient:ZkClient) {
       case e: ZkNoNodeException => {
         createParentPath(client, path)
         client.createEphemeral(path, data)
+      }
+    }
+  }
+
+  def tryCreatingControllerPath(controllerId: String): Unit = {
+    try {
+      createEphemeralPath(zkClient, ControllerPath, controllerId)
+    } catch {
+      case e: ZkNodeExistsException => {
+        val existingControllerId: String = zkClient.readData(ControllerPath)
+        throw new ControllerExistsException(existingControllerId)
       }
     }
   }

@@ -41,11 +41,11 @@ class MyZookeeperClientTest extends ZookeeperTestHarness {
     zkClient2.close()
     TestUtils.waitUntilTrue(() => {
       listener.liveBrokers.size == 2
-    }, "Waiting for all brokers to get added", 1000)
+    }, "Waiting for second broker to get removed", 1000)
 
     zkClient3.close()
     TestUtils.waitUntilTrue(() => {
       listener.liveBrokers.size == 1
-    }, "Waiting for all brokers to get added", 1000)
+    }, "Waiting for third broker to get removed", 1000)
   }
 }
