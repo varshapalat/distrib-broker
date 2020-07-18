@@ -1,15 +1,47 @@
 package org.dist.learningkafka
 
+import com.fasterxml.jackson.core.`type`.TypeReference
 import org.I0Itec.zkclient.exception.{ZkNoNodeException, ZkNodeExistsException}
 import org.I0Itec.zkclient.{IZkChildListener, ZkClient}
-import org.dist.simplekafka.ControllerExistsException
 import org.dist.simplekafka.common.JsonSerDes
 import org.dist.simplekafka.util.ZkUtils.Broker
+import org.dist.simplekafka.{ControllerExistsException, PartitionReplicas}
 
 import scala.jdk.CollectionConverters._
 
 class MyZookeeperClient(zkClient: ZkClient) {
 
+  def setPartitionReplicasForTopic(topicName: String, partitionReplicas: Set[PartitionReplicas]) = {
+    val topicsPath = getTopicPath(topicName)
+    val topicsData = JsonSerDes.serialize(partitionReplicas)
+    createPersistentPath(zkClient, topicsPath, topicsData)
+  }
+  def createPersistentPath(client: ZkClient, path: String, data: String = ""): Unit = {
+    try {
+      client.createPersistent(path, data)
+    } catch {
+      case e: ZkNoNodeException => {
+        createParentPath(client, path)
+        client.createPersistent(path, data)
+      }
+    }
+  }
+
+  def getAllTopics() = {
+    val topics = zkClient.getChildren(BrokerTopicsPath).asScala
+    topics.map(topicName => {
+      val partitionAssignments: String = zkClient.readData(getTopicPath(topicName))
+      val partitionReplicas: List[PartitionReplicas] = JsonSerDes.deserialize[List[PartitionReplicas]](partitionAssignments.getBytes, new TypeReference[List[PartitionReplicas]]() {})
+      (topicName, partitionReplicas)
+    }).toMap
+  }
+
+  private def getTopicPath(topicName: String) = {
+    BrokerTopicsPath + "/" + topicName
+  }
+  def getAllBrokerIds(): Set[Int] = {
+    zkClient.getChildren(BrokerIdsPath).asScala.map(_.toInt).toSet
+  }
 
   val BrokerTopicsPath = "/brokers/topics"
   val BrokerIdsPath = "/brokers/ids"
