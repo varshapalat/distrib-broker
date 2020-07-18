@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.`type`.TypeReference
 import org.I0Itec.zkclient.exception.{ZkNoNodeException, ZkNodeExistsException}
 import org.I0Itec.zkclient.{IZkChildListener, ZkClient}
 import org.dist.simplekafka.common.JsonSerDes
+import org.dist.simplekafka.util.ZkUtils
 import org.dist.simplekafka.util.ZkUtils.Broker
-import org.dist.simplekafka.{ControllerExistsException, PartitionReplicas}
+import org.dist.simplekafka.{ControllerExistsException, LeaderAndReplicas, PartitionReplicas}
 
 import scala.jdk.CollectionConverters._
 
@@ -115,4 +116,22 @@ class MyZookeeperClient(zkClient: ZkClient) {
     val result = zkClient.subscribeChildChanges(BrokerTopicsPath, listener)
     Option(result).map(_.asScala.toList)
   }
+
+  def setPartitionLeaderForTopic(topicName: String, leaderAndReplicas: List[LeaderAndReplicas]): Unit = {
+
+    val leaderReplicaSerializer = JsonSerDes.serialize(leaderAndReplicas)
+    val path = getReplicaLeaderElectionPath(topicName);
+
+    try {
+      ZkUtils.updatePersistentPath(zkClient,path, leaderReplicaSerializer)
+    } catch {
+      case e: Throwable => {
+        println("Exception while writing data to partition leader data" + e)
+      }
+    }
+  }
+  def getReplicaLeaderElectionPath(topicName: String) = {
+    ReplicaLeaderElectionPath + "/" + topicName
+  }
+
 }
