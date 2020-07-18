@@ -106,4 +106,13 @@ class MyZookeeperClient(zkClient: ZkClient) {
     if (parentDir.length != 0)
       client.createPersistent(parentDir, true)
   }
+
+  def getPartitionAssignmentsFor(topicName: String): List[PartitionReplicas] = {
+    val partitionAssignments: String = zkClient.readData(getTopicPath(topicName))
+    JsonSerDes.deserialize[List[PartitionReplicas]](partitionAssignments.getBytes, new TypeReference[List[PartitionReplicas]]() {})
+  }
+  def subscribeTopicChangeListener(listener: IZkChildListener): Option[List[String]] = {
+    val result = zkClient.subscribeChildChanges(BrokerTopicsPath, listener)
+    Option(result).map(_.asScala.toList)
+  }
 }
